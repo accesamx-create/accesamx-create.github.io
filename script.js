@@ -26,18 +26,42 @@ tabs.appendChild(b);
 });
 }
 
-function renderProducts(){
-const term=search.value.toLowerCase();
-products.innerHTML='';
-(data[currentSheet]||[])
-.filter(p=>p.descripcion.toLowerCase().includes(term))
-.forEach(p=>{
-const c=document.createElement('div');
-c.className='card';
-c.innerHTML=`<h3>${p.descripcion}</h3>
-<p><b>Inventario:</b> ${p.inventario}</p>
-<p><b>Precio:</b> $${p.precio}</p>`;
-products.appendChild(c);
-});
+function renderProducts() {
+    const term = search.value.toLowerCase();
+    products.innerHTML = '';
+
+    (data[currentSheet] || [])
+        .filter(p => {
+
+            // Ignorar registros vacíos o con null
+            if (
+                p.descripcion == null ||
+                p.descripcion === "null" ||
+                p.precio == null ||
+                p.precio === "null"
+            ) {
+                return false;
+            }
+
+            return p.descripcion.toLowerCase().includes(term);
+        })
+        .forEach(p => {
+
+            // Quitar decimales del precio
+            const precio = Number(p.precio) || 0;
+
+            const c = document.createElement('div');
+            c.className = 'card';
+
+            c.innerHTML = `
+                <h3>${p.descripcion}</h3>
+                <p><b>Inventario:</b> ${p.inventario}</p>
+                <p><b>Precio Público:</b> $${precio.toLocaleString('es-MX', {
+                    maximumFractionDigits: 0
+                })}</p>
+            `;
+
+            products.appendChild(c);
+        });
 }
 search.addEventListener('input',renderProducts);
