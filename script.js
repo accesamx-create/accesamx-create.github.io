@@ -56,7 +56,7 @@ function renderProducts() {
             c.innerHTML = `
                 <h3>${p.descripcion}</h3>
                 <p><b>Inventario:</b> ${p.inventario}</p>
-                <p><b>Precio Público:</b> $${precio.toLocaleString('es-MX', {
+                <p><b>Precio:</b> $${precio.toLocaleString('es-MX', {
                     maximumFractionDigits: 0
                 })}</p>
             `;
