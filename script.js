@@ -53,7 +53,7 @@ function renderProducts() {
             const precioBase = Number(p.precio) || 0;
 
             // USD × 1.22 × 18
-            const precioFinal = Math.round(precioBase * 1.22 * 18);
+            const precioFinal = Math.round(precioBase * 1.22 * 17.20);
 
             const card = document.createElement('div');
             card.className = 'card';
