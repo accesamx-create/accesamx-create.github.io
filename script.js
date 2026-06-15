@@ -1,67 +1,71 @@
-
-let data={};
-let currentSheet='';
+let data = {};
+let currentSheet = '';
 
 fetch('productos.json')
-.then(r=>r.json())
-.then(json=>{
-data=json;
-currentSheet=Object.keys(data)[0];
-renderTabs();
-renderProducts();
+.then(r => r.json())
+.then(json => {
+    data = json;
+    currentSheet = Object.keys(data)[0];
+    renderTabs();
+    renderProducts();
 });
 
-const tabs=document.getElementById('tabs');
-const products=document.getElementById('products');
-const search=document.getElementById('search');
+const tabs = document.getElementById('tabs');
+const products = document.getElementById('products');
+const search = document.getElementById('search');
 
-function renderTabs(){
-tabs.innerHTML='';
-Object.keys(data).forEach(sheet=>{
-const b=document.createElement('div');
-b.className='tab'+(sheet===currentSheet?' active':'');
-b.textContent=sheet;
-b.onclick=()=>{currentSheet=sheet;renderTabs();renderProducts();};
-tabs.appendChild(b);
-});
+function renderTabs() {
+    tabs.innerHTML = '';
+
+    Object.keys(data).forEach(sheet => {
+        const b = document.createElement('div');
+
+        b.className = 'tab' + (sheet === currentSheet ? ' active' : '');
+        b.textContent = sheet;
+
+        b.onclick = () => {
+            currentSheet = sheet;
+            renderTabs();
+            renderProducts();
+        };
+
+        tabs.appendChild(b);
+    });
 }
 
 function renderProducts() {
     const term = search.value.toLowerCase();
+
     products.innerHTML = '';
 
     (data[currentSheet] || [])
         .filter(p => {
 
-            // Ignorar registros vacíos o con null
-            if (
-                p.descripcion == null ||
-                p.descripcion === "null" ||
-                p.precio == null ||
-                p.precio === "null"
-            ) {
-                return false;
-            }
+            // Ignorar registros vacíos o null
+            if (!p.descripcion) return false;
+            if (String(p.descripcion).toLowerCase() === 'null') return false;
+            if (p.precio == null) return false;
 
             return p.descripcion.toLowerCase().includes(term);
         })
         .forEach(p => {
 
-            // Quitar decimales del precio
-            const precio = Number(p.precio) || 0;
+            const precioBase = Number(p.precio) || 0;
 
-            const c = document.createElement('div');
-            c.className = 'card';
+            // USD × 1.22 × 18
+            const precioFinal = Math.round(precioBase * 1.22 * 18);
 
-            c.innerHTML = `
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            card.innerHTML = `
                 <h3>${p.descripcion}</h3>
-                <p><b>Inventario:</b> ${p.inventario}</p>
-                <p><b>Precio:</b> $${precio.toLocaleString('es-MX', {
-                    maximumFractionDigits: 0
-                })}</p>
+                <p><b>Inventario:</b> ${p.inventario ?? ''}</p>
+                <p><b>Precio:</b> $${precioFinal.toLocaleString('es-MX')}</p>
             `;
 
-            products.appendChild(c);
+            products.appendChild(card);
         });
 }
-search.addEventListener('input',renderProducts);
+
+search.addEventListener('input', renderProducts);
